@@ -1,11 +1,11 @@
 1. Hardcoded JWT Secret
 	- will store JWT Secret in an evironment variable
 
-2. /data and /delete endpoints (Developer Routes)
-	- risk: these endpoints allow anyone to view all user data and delete users without 
+2. /data and /delete endpoints (Developer Routes) - `FIXED`
+	- risk: these endpoints allowed anyone to view all user data and delete users without 
 	authentication or authorization.
-	- fix: protect these routes with authentication and admin authorization, or remove them in
-	production.
+	- fix: removed these vulnerable endpoints completely. Database administration is now handled
+	through secure command-line scripts in the scripts/ directory.
 
 3. No Rate Limiting or Sensitive Endpoints (Rate Limiting is a Security technique that restricts 
 how many times someone can call your API Endpoints in a sertain period(for example 5 login attempts

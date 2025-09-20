@@ -5,9 +5,10 @@ import { renderLogin } from './login';
 import { renderSignUp } from './signup';
 import { renderDashboard } from './dashboard';
 import { renderGame } from './game';
-import { renderDelete } from './delete';
+// import { renderDelete } from './delete';
 import { renderGoogle } from './google';
 import { renderTwoFA } from './twofa';
+import { isAuthenticated, hasTempToken, PROTECTED_ROUTES, PUBLIC_ONLY_ROUTES } from './auth';
 
 
 // --- DOM ---
@@ -61,7 +62,7 @@ const routes: { [key: string]: () => (() => void) | void } = { // render functio
   '/google-auth-handler': handleGoogleAuthToken,
   '/game': renderGame,
   '/dashboard': renderDashboard,
-  '/delete': renderDelete, // Add the delete route
+//   '/delete': renderDelete, // Add the delete route
   '/username-google': renderGoogle,
   '/2fa': renderTwoFA,
 
@@ -80,6 +81,49 @@ function router() {
   // Get the path from the pathname
   const path = window.location.pathname || '/';
   console.log("Navigating to:", path); // For debugging
+
+  // Authentication checks
+  const userIsAuthenticated = isAuthenticated();
+  const userHasTempToken = hasTempToken();
+
+  // Check if this is a protected route
+  if (PROTECTED_ROUTES.includes(path)) {
+    if (!userIsAuthenticated) {
+      console.log("Access denied: Authentication required for", path);
+      // Redirect to login for protected routes
+      history.replaceState({}, '', '/login');
+      const cleanup = renderLogin();
+      if (typeof cleanup === 'function') {
+        currentCleanupFunction = cleanup;
+      }
+      return;
+    }
+  }
+
+  // Check if user is trying to access public-only routes while authenticated
+  if (PUBLIC_ONLY_ROUTES.includes(path) && userIsAuthenticated) {
+    console.log("Redirecting authenticated user from", path, "to dashboard");
+    // Redirect authenticated users away from login/signup pages
+    history.replaceState({}, '', '/dashboard');
+    const cleanup = renderDashboard();
+    if (typeof cleanup === 'function') {
+      currentCleanupFunction = cleanup;
+    }
+    return;
+  }
+
+  // Special case for 2FA route
+  if (path === '/2fa') {
+    if (!userHasTempToken && !userIsAuthenticated) {
+      console.log("Access denied: No temp token for 2FA");
+      history.replaceState({}, '', '/login');
+      const cleanup = renderLogin();
+      if (typeof cleanup === 'function') {
+        currentCleanupFunction = cleanup;
+      }
+      return;
+    }
+  }
 
   // Find the matching route or default to Welcome
   const renderFunction = routes[path] || routes['/'] || renderWelcome; // Ensure fallback

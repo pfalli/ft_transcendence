@@ -108,36 +108,8 @@ const developerRoutes = (app) => {
     reply.send({ success: true, message: '2FA verified successfully' });
   });
 
-	app.get('/data', async (req, reply) => {
-		try {
-			const tables = await DB('credentialsTable');
-			reply.send(tables);
-		} catch (e) {
-			console.error(e);
-			reply.status(500).send({ error: 'Database fetch error' });
-		}
-	});
-
-	app.post('/delete', async (req, reply) => {
-		const { id } = req.body;
-
-		if (!id || typeof id !== 'number') { // Basic validation
-			reply.status(400).send({ error: 'A valid numeric ID is required' });
-			return;
-		}
-
-		try {
-			const deletedCount = await DB('credentialsTable').where({ id }).del();
-			if (deletedCount > 0) {
-				reply.send({ success: true, message: `User with ID ${id} deleted.` });
-			} else {
-				reply.status(404).send({ success: false, message: `User with ID ${id} not found.` });
-			}
-		} catch (e) {
-			console.error(e);
-			reply.status(500).send({ error: 'Delete operation failed due to server error' });
-		}
-	});
+	// Developer routes removed for security reasons
+	// If admin functionality is needed, implement proper authentication and authorization
 }
 
 const credentialsRoutes = (app) =>{
