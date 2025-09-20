@@ -227,8 +227,11 @@ export function renderChat(socket: Socket): () => void {
 
   inviteBtn.addEventListener('click', () => {
     if (selectedUser) {
+      console.log('[DEBUG] Sending tournament invite to:', selectedUser.username, 'Socket ID:', selectedUser.socketId);
       socket.emit('send_public_tournament_invite', { targetSocketId: selectedUser.socketId });
       appendMessage('🤖', `Tournament invite sent to ${selectedUser.username}`);
+    } else {
+      console.log('[DEBUG] No user selected for invite');
     }
   });
 

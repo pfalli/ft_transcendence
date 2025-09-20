@@ -161,6 +161,17 @@ export function renderDashboard() {
     chatSocket.on('reconnect_failed', () => {
       console.log('Chat socket failed to reconnect');
     });
+
+    // Set up invite handling inside the socket setup
+    chatSocket.on('receive_public_tournament_invite', ({ senderAlias, senderSocketId }) => {
+      console.log('[DEBUG] Received tournament invite from:', senderAlias, 'Socket ID:', senderSocketId); // Debug log
+      if (chatSocket) {
+        console.log('[DEBUG] Showing lobby invite card');
+        showLobbyInviteCard(senderAlias, senderSocketId, chatSocket);
+      } else {
+        console.log('[DEBUG] No chatSocket available to show invite card');
+      }
+    });
   }
   }, 100); // Close setTimeout - 100ms delay to ensure token is available
 
@@ -196,14 +207,6 @@ export function renderDashboard() {
 
   // --- Initial View ---
   setActiveView('profile', navButtons, contentArea); // Set initial view to profile
-
-  if (chatSocket) {
-    chatSocket.on('receive_public_tournament_invite', ({ senderAlias, senderSocketId }) => {
-      if (chatSocket) {
-        showLobbyInviteCard(senderAlias, senderSocketId, chatSocket);
-      }
-    });
-  }
 
 function showTokenExpired(contentArea: HTMLElement) {
   contentArea.innerHTML = `

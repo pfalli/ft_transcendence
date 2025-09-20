@@ -612,11 +612,13 @@ socket.on('player_inactive', () => {
 
 
 	socket.on('send_public_tournament_invite', ({ targetSocketId }) => {
+		console.log(`[DEBUG] Tournament invite request from ${socket.id} to ${targetSocketId}`);
+		
 		const sender = onlineUsers.get(socket.id);
 		const recipient = onlineUsers.get(targetSocketId);
 
 		if (!sender || !recipient) {
-			console.log('Could not find sender or recipient for tournament invite.');
+			console.log(`[DEBUG] Could not find sender or recipient for tournament invite. Sender: ${sender ? sender.alias : 'null'}, Recipient: ${recipient ? recipient.alias : 'null'}`);
 			return;
 		}
 
@@ -625,9 +627,13 @@ socket.on('player_inactive', () => {
 			senderSocketId: socket.id
 		};
 
+		console.log(`[DEBUG] Sending tournament invite from ${sender.alias} to ${recipient.alias}. Payload:`, payload);
+
 		// Send the special invite message to both users' chat windows
 		io.to(socket.id).emit('receive_public_tournament_invite', payload);
 		io.to(targetSocketId).emit('receive_public_tournament_invite', payload);
+		
+		console.log(`[DEBUG] Tournament invite sent successfully`);
 	});
 
 	socket.on('dismiss_lobby_invite', ({ senderSocketId }) => {
