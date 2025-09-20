@@ -1364,7 +1364,7 @@ app.setNotFoundHandler((req, reply) => {
 const start =  async () => {
 	try{
 		const address = await app.listen({ port: PORT, host: HOST });
-		console.log("Server running " + address)
+		// console.log("Server running " + address)
 		console.log(`Access to school ${process.env.APP_URL}`)
 	}
 	catch (e){
