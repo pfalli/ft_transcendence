@@ -1,4 +1,4 @@
 node_modules
-.env
+../.env
 https_keys
 data_controller/data/myData.db
